@@ -1,0 +1,160 @@
+:root {
+  --bg: #0f1115;
+  --panel: #1a1d24;
+  --text: #e8e9ec;
+  --muted: #9aa0ab;
+  --low: #4d8bf0;
+  --ok: #2fb56b;
+  --high: #e0a72f;
+  --danger: #e0522f;
+  --border: #2a2e37;
+  font-size: 16px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0 0 2rem;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, Roboto, "Segoe UI", Arial, sans-serif;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+header h1 { font-size: 1.25rem; margin: 0; }
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.status-bar {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.status-bar.error { color: var(--danger); }
+
+.summary {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0 1.25rem 0.5rem;
+  flex-wrap: wrap;
+}
+.summary .card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  min-width: 90px;
+  flex: 1;
+  text-align: center;
+}
+.summary .card .value { font-size: 1.4rem; font-weight: 700; }
+.summary .card .label { font-size: 0.75rem; color: var(--muted); }
+
+.panel {
+  margin: 1rem 1.25rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.panel h2 { font-size: 1rem; margin: 0 0 0.5rem; }
+
+.primary-btn {
+  background: #3b6fe0;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+th, td { text-align: left; padding: 0.45rem 0.4rem; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; }
+
+tr.low td:first-child, tr.low .badge { color: var(--low); }
+tr.high td:first-child, tr.high .badge { color: var(--danger); }
+tr.ok td:first-child { color: var(--ok); }
+
+.badge {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 700;
+}
+.badge.low { background: rgba(77,139,240,0.15); color: var(--low); }
+.badge.ok { background: rgba(47,181,107,0.15); color: var(--ok); }
+.badge.high { background: rgba(224,82,47,0.15); color: var(--danger); }
+
+.meal-marker { font-size: 0.85rem; }
+
+.meals-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.meal-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+.meal-card .meal-main { display: flex; flex-direction: column; }
+.meal-card .meal-time { font-weight: 600; }
+.meal-card .meal-label { color: var(--muted); font-size: 0.85rem; }
+.meal-card .meal-stats { text-align: right; font-size: 0.85rem; }
+.meal-card .meal-stats .delta { font-weight: 700; font-size: 1rem; }
+.meal-card button.delete {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1rem;
+  cursor: pointer;
+}
+.empty-hint { color: var(--muted); font-size: 0.85rem; }
+
+dialog {
+  border: none;
+  border-radius: 14px;
+  padding: 0;
+  background: var(--panel);
+  color: var(--text);
+  width: min(420px, 90vw);
+}
+dialog::backdrop { background: rgba(0,0,0,0.5); }
+dialog form { padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; }
+dialog h2 { margin: 0 0 0.25rem; font-size: 1.1rem; }
+dialog label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.85rem; color: var(--muted); }
+dialog input, dialog select {
+  background: #10131a;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem;
+  color: var(--text);
+  font-size: 1rem;
+}
+.dialog-actions { display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 0.5rem; }
+.dialog-actions button { padding: 0.5rem 0.9rem; border-radius: 8px; border: none; cursor: pointer; }
+.dialog-actions button[type="button"] { background: #2a2e37; color: var(--text); }

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glicose Hora a Hora</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Glicose Hora a Hora</h1>
+  <button id="btnSettings" class="icon-btn" title="Definições">&#9881;</button>
+</header>
+
+<section id="statusBar" class="status-bar"></section>
+
+<section id="summary" class="summary"></section>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Refeições</h2>
+    <button id="btnAddMeal" class="primary-btn">+ Registar refeição</button>
+  </div>
+  <div id="mealsList" class="meals-list"></div>
+</section>
+
+<section class="panel">
+  <h2>Leituras por hora</h2>
+  <div id="hourlyTableWrap">
+    <table id="hourlyTable">
+      <thead>
+        <tr>
+          <th>Hora</th>
+          <th>Última</th>
+          <th>Mín</th>
+          <th>Máx</th>
+          <th>Tend.</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="hourlyBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<dialog id="mealDialog">
+  <form id="mealForm">
+    <h2>Registar refeição</h2>
+    <label>Data/hora
+      <input type="datetime-local" id="mealTime" required>
+    </label>
+    <label>Descrição (opcional)
+      <input type="text" id="mealLabel" placeholder="ex: Almoço - massa">
+    </label>
+    <label>Carboidratos em gramas (opcional)
+      <input type="number" id="mealCarbs" min="0" step="1" placeholder="ex: 60">
+    </label>
+    <div class="dialog-actions">
+      <button type="button" id="mealCancel">Cancelar</button>
+      <button type="submit" class="primary-btn">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="settingsDialog">
+  <form id="settingsForm">
+    <h2>Definições</h2>
+    <label>Endereço do xDrip+ (normalmente 127.0.0.1)
+      <input type="text" id="setHost">
+    </label>
+    <label>Porta
+      <input type="number" id="setPort">
+    </label>
+    <label>Palavra-passe da Web Service (deixa vazio se não definiste nenhuma)
+      <input type="text" id="setSecret">
+    </label>
+    <label>Unidades
+      <select id="setUnits">
+        <option value="mgdl">mg/dL</option>
+        <option value="mmol">mmol/L</option>
+      </select>
+    </label>
+    <label>Limite baixo (hipo), mg/dL
+      <input type="number" id="setLow">
+    </label>
+    <label>Limite alto (hiper), mg/dL
+      <input type="number" id="setHigh">
+    </label>
+    <label>Horas a mostrar
+      <input type="number" id="setLookback" min="1" max="72">
+    </label>
+    <label>Janela pós-refeição para calcular o pico (minutos)
+      <input type="number" id="setPeakWindow" min="30" max="240" step="15">
+    </label>
+    <label>Atualizar automaticamente a cada (minutos, 0 = desliga)
+      <input type="number" id="setRefresh" min="0" max="60">
+    </label>
+    <div class="dialog-actions">
+      <button type="button" id="settingsCancel">Cancelar</button>
+      <button type="submit" class="primary-btn">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>

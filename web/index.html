@@ -4,7 +4,169 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Glicose Hora a Hora</title>
-<link rel="stylesheet" href="style.css">
+<style>
+:root {
+  --bg: #0f1115;
+  --panel: #1a1d24;
+  --text: #e8e9ec;
+  --muted: #9aa0ab;
+  --low: #4d8bf0;
+  --ok: #2fb56b;
+  --high: #e0a72f;
+  --danger: #e0522f;
+  --border: #2a2e37;
+  font-size: 16px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0 0 2rem;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, Roboto, "Segoe UI", Arial, sans-serif;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+header h1 { font-size: 1.25rem; margin: 0; }
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.status-bar {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.status-bar.error { color: var(--danger); }
+
+.summary {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0 1.25rem 0.5rem;
+  flex-wrap: wrap;
+}
+.summary .card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  min-width: 90px;
+  flex: 1;
+  text-align: center;
+}
+.summary .card .value { font-size: 1.4rem; font-weight: 700; }
+.summary .card .label { font-size: 0.75rem; color: var(--muted); }
+
+.panel {
+  margin: 1rem 1.25rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.panel h2 { font-size: 1rem; margin: 0 0 0.5rem; }
+
+.primary-btn {
+  background: #3b6fe0;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+th, td { text-align: left; padding: 0.45rem 0.4rem; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; }
+
+tr.low td:first-child, tr.low .badge { color: var(--low); }
+tr.high td:first-child, tr.high .badge { color: var(--danger); }
+tr.ok td:first-child { color: var(--ok); }
+
+.badge {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 700;
+}
+.badge.low { background: rgba(77,139,240,0.15); color: var(--low); }
+.badge.ok { background: rgba(47,181,107,0.15); color: var(--ok); }
+.badge.high { background: rgba(224,82,47,0.15); color: var(--danger); }
+
+.meal-marker { font-size: 0.85rem; }
+
+.meals-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.meal-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+.meal-card .meal-main { display: flex; flex-direction: column; }
+.meal-card .meal-time { font-weight: 600; }
+.meal-card .meal-label { color: var(--muted); font-size: 0.85rem; }
+.meal-card .meal-stats { text-align: right; font-size: 0.85rem; }
+.meal-card .meal-stats .delta { font-weight: 700; font-size: 1rem; }
+.meal-card button.delete {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1rem;
+  cursor: pointer;
+}
+.empty-hint { color: var(--muted); font-size: 0.85rem; }
+
+dialog {
+  border: none;
+  border-radius: 14px;
+  padding: 0;
+  background: var(--panel);
+  color: var(--text);
+  width: min(420px, 90vw);
+}
+dialog::backdrop { background: rgba(0,0,0,0.5); }
+dialog form { padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; }
+dialog h2 { margin: 0 0 0.25rem; font-size: 1.1rem; }
+dialog label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.85rem; color: var(--muted); }
+dialog input, dialog select {
+  background: #10131a;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem;
+  color: var(--text);
+  font-size: 1rem;
+}
+.dialog-actions { display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 0.5rem; }
+.dialog-actions button { padding: 0.5rem 0.9rem; border-radius: 8px; border: none; cursor: pointer; }
+.dialog-actions button[type="button"] { background: #2a2e37; color: var(--text); }
+
+</style>
 </head>
 <body>
 <header>
@@ -127,6 +289,519 @@
   </form>
 </dialog>
 
-<script src="app.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  const DEFAULT_SETTINGS = {
+    host: "127.0.0.1",
+    port: 17580,
+    secret: "",
+    units: "mgdl",
+    low: 70,
+    high: 180,
+    lookbackHours: 24,
+    peakWindowMinutes: 120,
+    refreshMinutes: 5,
+  };
+
+  const SETTINGS_KEY = "glicose.settings";
+  const MEALS_KEY = "glicose.meals";
+  const MANUAL_KEY = "glicose.manualReadings";
+
+  function loadSettings() {
+    try {
+      const raw = localStorage.getItem(SETTINGS_KEY);
+      if (!raw) return { ...DEFAULT_SETTINGS };
+      return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+    } catch (e) {
+      return { ...DEFAULT_SETTINGS };
+    }
+  }
+
+  function saveSettings(settings) {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  }
+
+  function loadMeals() {
+    try {
+      const raw = localStorage.getItem(MEALS_KEY);
+      if (!raw) return [];
+      return JSON.parse(raw);
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveMeals(meals) {
+    localStorage.setItem(MEALS_KEY, JSON.stringify(meals));
+  }
+
+  function loadManualReadings() {
+    try {
+      const raw = localStorage.getItem(MANUAL_KEY);
+      if (!raw) return [];
+      return JSON.parse(raw);
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveManualReadings(readings) {
+    localStorage.setItem(MANUAL_KEY, JSON.stringify(readings));
+  }
+
+  // ---- Pure data helpers (also used by tests) ----
+
+  function mgdlToMmol(mgdl) {
+    return mgdl / 18.018;
+  }
+
+  function mmolToMgdl(mmol) {
+    return mmol * 18.018;
+  }
+
+  function formatValue(mgdl, units) {
+    if (mgdl == null) return "-";
+    if (units === "mmol") return mgdlToMmol(mgdl).toFixed(1);
+    return String(Math.round(mgdl));
+  }
+
+  const TREND_ARROWS = {
+    NONE: "?",
+    DoubleUp: "↑↑",
+    SingleUp: "↑",
+    FortyFiveUp: "↗",
+    Flat: "→",
+    FortyFiveDown: "↘",
+    SingleDown: "↓",
+    DoubleDown: "↓↓",
+    NOT_COMPUTABLE: "?",
+    RATE_OUT_OF_RANGE: "?",
+  };
+
+  function trendArrow(direction) {
+    return TREND_ARROWS[direction] || "?";
+  }
+
+  function classify(mgdl, low, high) {
+    if (mgdl == null) return "";
+    if (mgdl < low) return "low";
+    if (mgdl > high) return "high";
+    return "ok";
+  }
+
+  /**
+   * Groups sgv entries (each {date(ms), sgv(mg/dL), direction}) into per-hour buckets.
+   * Returns array sorted descending by hour start, each bucket:
+   * { hourStart(ms), last, min, max, count, direction }
+   */
+  function groupByHour(entries) {
+    const buckets = new Map();
+    for (const e of entries) {
+      const d = new Date(e.date);
+      d.setMinutes(0, 0, 0);
+      const key = d.getTime();
+      if (!buckets.has(key)) {
+        buckets.set(key, { hourStart: key, readings: [] });
+      }
+      buckets.get(key).readings.push(e);
+    }
+    const result = [];
+    for (const bucket of buckets.values()) {
+      const sorted = bucket.readings.slice().sort((a, b) => a.date - b.date);
+      const values = sorted.map((r) => r.sgv);
+      const lastReading = sorted[sorted.length - 1];
+      result.push({
+        hourStart: bucket.hourStart,
+        last: lastReading.sgv,
+        direction: lastReading.direction,
+        min: Math.min(...values),
+        max: Math.max(...values),
+        count: sorted.length,
+        hasManual: sorted.some((r) => r.source === "manual"),
+      });
+    }
+    result.sort((a, b) => b.hourStart - a.hourStart);
+    return result;
+  }
+
+  /**
+   * For a meal at mealTime(ms), finds the baseline (closest reading at/before meal time,
+   * falling back to the closest reading after) and the peak reading within peakWindowMinutes after.
+   */
+  function analyzeMeal(entries, mealTimeMs, peakWindowMinutes) {
+    const sorted = entries.slice().sort((a, b) => a.date - b.date);
+    let baseline = null;
+    for (const e of sorted) {
+      if (e.date <= mealTimeMs) baseline = e;
+      else break;
+    }
+    if (!baseline) {
+      baseline = sorted.find((e) => e.date > mealTimeMs) || null;
+    }
+
+    const windowEnd = mealTimeMs + peakWindowMinutes * 60 * 1000;
+    const windowReadings = sorted.filter(
+      (e) => e.date >= mealTimeMs && e.date <= windowEnd
+    );
+
+    let peak = null;
+    for (const e of windowReadings) {
+      if (!peak || e.sgv > peak.sgv) peak = e;
+    }
+
+    if (!baseline || !peak) {
+      return { baseline, peak, delta: null };
+    }
+    return { baseline, peak, delta: peak.sgv - baseline.sgv };
+  }
+
+  function buildSgvUrl(settings) {
+    const count = Math.max(1, Math.round((settings.lookbackHours * 60) / 5) + 20);
+    return `http://${settings.host}:${settings.port}/sgv.json?count=${count}`;
+  }
+
+  async function sha1Hex(text) {
+    const enc = new TextEncoder().encode(text);
+    const hashBuffer = await crypto.subtle.digest("SHA-1", enc);
+    return Array.from(new Uint8Array(hashBuffer))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+  }
+
+  async function fetchEntries(settings) {
+    const headers = {};
+    if (settings.secret) {
+      headers["api-secret"] = await sha1Hex(settings.secret);
+    }
+    const res = await fetch(buildSgvUrl(settings), { headers });
+    if (!res.ok) {
+      throw new Error(`O xDrip+ respondeu com o código ${res.status}`);
+    }
+    const data = await res.json();
+    const cutoff = Date.now() - settings.lookbackHours * 60 * 60 * 1000;
+    return data
+      .filter((e) => typeof e.sgv === "number" && e.date >= cutoff)
+      .map((e) => ({ date: e.date, sgv: e.sgv, direction: e.direction, source: "xdrip" }));
+  }
+
+  /**
+   * Merges live xDrip+ entries with manually-added historical readings into one
+   * sorted list, so both feed the same hourly grouping / meal analysis.
+   */
+  function mergeEntries(liveEntries, manualReadings) {
+    const manualAsEntries = manualReadings.map((m) => ({
+      date: m.date,
+      sgv: m.sgv,
+      direction: undefined,
+      source: "manual",
+    }));
+    return liveEntries.concat(manualAsEntries).sort((a, b) => a.date - b.date);
+  }
+
+  // ---- UI wiring (skipped entirely in non-browser test environment) ----
+
+  const isBrowser = typeof window !== "undefined" && typeof document !== "undefined";
+
+  if (isBrowser) {
+    let settings = loadSettings();
+    let meals = loadMeals();
+    let manualReadings = loadManualReadings();
+    let liveEntries = [];
+    let latestEntries = [];
+    let refreshTimer = null;
+
+    const statusBar = document.getElementById("statusBar");
+    const summaryEl = document.getElementById("summary");
+    const hourlyBody = document.getElementById("hourlyBody");
+    const mealsList = document.getElementById("mealsList");
+    const manualList = document.getElementById("manualList");
+
+    function setStatus(message, isError) {
+      statusBar.textContent = message;
+      statusBar.classList.toggle("error", !!isError);
+    }
+
+    function hourLabel(ms) {
+      const d = new Date(ms);
+      const today = new Date();
+      const isToday = d.toDateString() === today.toDateString();
+      const time = d.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
+      if (isToday) return time;
+      const day = d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit" });
+      return `${day} ${time}`;
+    }
+
+    function mealsInHour(hourStart) {
+      const hourEnd = hourStart + 60 * 60 * 1000;
+      return meals.filter((m) => m.time >= hourStart && m.time < hourEnd);
+    }
+
+    function renderSummary() {
+      if (latestEntries.length === 0) {
+        summaryEl.innerHTML = "";
+        return;
+      }
+      const values = latestEntries.map((e) => e.sgv);
+      const avg = values.reduce((a, b) => a + b, 0) / values.length;
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const inRange = values.filter((v) => v >= settings.low && v <= settings.high).length;
+      const inRangePct = Math.round((inRange / values.length) * 100);
+
+      const cards = [
+        { label: "Média", value: formatValue(avg, settings.units) },
+        { label: "Mínimo", value: formatValue(min, settings.units) },
+        { label: "Máximo", value: formatValue(max, settings.units) },
+        { label: "Tempo no intervalo", value: `${inRangePct}%` },
+      ];
+      summaryEl.innerHTML = cards
+        .map(
+          (c) => `<div class="card"><div class="value">${c.value}</div><div class="label">${c.label}</div></div>`
+        )
+        .join("");
+    }
+
+    function renderHourly() {
+      const buckets = groupByHour(latestEntries);
+      hourlyBody.innerHTML = buckets
+        .map((b) => {
+          const cls = classify(b.last, settings.low, settings.high);
+          const mealsHere = mealsInHour(b.hourStart);
+          const mealMark = mealsHere.length ? `<span class="meal-marker" title="${mealsHere.map((m) => m.label || "refeição").join(", ")}">🍽️</span>` : "";
+          const manualMark = b.hasManual ? `<span class="meal-marker" title="Leitura manual (antiga)">✍️</span>` : "";
+          return `<tr class="${cls}">
+            <td>${hourLabel(b.hourStart)}</td>
+            <td><span class="badge ${cls}">${formatValue(b.last, settings.units)}</span></td>
+            <td>${formatValue(b.min, settings.units)}</td>
+            <td>${formatValue(b.max, settings.units)}</td>
+            <td>${trendArrow(b.direction)}</td>
+            <td>${mealMark}${manualMark}</td>
+          </tr>`;
+        })
+        .join("");
+      if (buckets.length === 0) {
+        hourlyBody.innerHTML = `<tr><td colspan="6" class="empty-hint">Sem leituras no período selecionado.</td></tr>`;
+      }
+    }
+
+    function renderMeals() {
+      const sorted = meals.slice().sort((a, b) => b.time - a.time);
+      if (sorted.length === 0) {
+        mealsList.innerHTML = `<div class="empty-hint">Ainda não registaste nenhuma refeição.</div>`;
+        return;
+      }
+      mealsList.innerHTML = sorted
+        .map((m) => {
+          const { baseline, peak, delta } = analyzeMeal(latestEntries, m.time, settings.peakWindowMinutes);
+          let stats = "Sem dados suficientes";
+          if (delta != null) {
+            const sign = delta >= 0 ? "+" : "";
+            const peakTime = new Date(peak.date).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
+            stats = `pico ${formatValue(peak.sgv, settings.units)} às ${peakTime}<br><span class="delta">${sign}${formatValue(delta, settings.units)}</span>`;
+          }
+          const time = new Date(m.time).toLocaleString("pt-PT", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+          const carbs = m.carbs ? ` &middot; ${m.carbs} g HC` : "";
+          return `<div class="meal-card" data-id="${m.id}">
+            <div class="meal-main">
+              <span class="meal-time">${time}</span>
+              <span class="meal-label">${m.label || "Refeição"}${carbs}</span>
+            </div>
+            <div class="meal-stats">${stats}</div>
+            <button class="delete" data-id="${m.id}" title="Apagar">&times;</button>
+          </div>`;
+        })
+        .join("");
+
+      mealsList.querySelectorAll("button.delete").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-id");
+          meals = meals.filter((m) => String(m.id) !== id);
+          saveMeals(meals);
+          renderMeals();
+          renderHourly();
+        });
+      });
+    }
+
+    function renderManualList() {
+      const sorted = manualReadings.slice().sort((a, b) => b.date - a.date);
+      if (sorted.length === 0) {
+        manualList.innerHTML = `<div class="empty-hint">Ainda não adicionaste nenhuma leitura antiga.</div>`;
+        return;
+      }
+      manualList.innerHTML = sorted
+        .map((m) => {
+          const time = new Date(m.date).toLocaleString("pt-PT", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+          return `<div class="meal-card" data-id="${m.id}">
+            <div class="meal-main">
+              <span class="meal-time">${time}</span>
+              <span class="meal-label">Leitura manual</span>
+            </div>
+            <div class="meal-stats">${formatValue(m.sgv, settings.units)} ${settings.units === "mmol" ? "mmol/L" : "mg/dL"}</div>
+            <button class="delete" data-id="${m.id}" title="Apagar">&times;</button>
+          </div>`;
+        })
+        .join("");
+
+      manualList.querySelectorAll("button.delete").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-id");
+          manualReadings = manualReadings.filter((m) => String(m.id) !== id);
+          saveManualReadings(manualReadings);
+          latestEntries = mergeEntries(liveEntries, manualReadings);
+          renderManualList();
+          renderSummary();
+          renderHourly();
+          renderMeals();
+        });
+      });
+    }
+
+    async function refresh() {
+      setStatus("A atualizar...");
+      try {
+        liveEntries = await fetchEntries(settings);
+        latestEntries = mergeEntries(liveEntries, manualReadings);
+        renderSummary();
+        renderHourly();
+        renderMeals();
+        renderManualList();
+        setStatus(`Atualizado às ${new Date().toLocaleTimeString("pt-PT")} · ${latestEntries.length} leituras`);
+      } catch (err) {
+        console.error(err);
+        const hint = err instanceof TypeError
+          ? " (pode ser CORS/rede: confirma que o Web Service está ativo no xDrip+ e que estás a abrir esta página no mesmo telemóvel)"
+          : "";
+        setStatus(`Erro a ligar ao xDrip+: ${err.message}${hint}`, true);
+        latestEntries = mergeEntries([], manualReadings);
+        renderHourly();
+        renderManualList();
+      }
+    }
+
+    function scheduleRefresh() {
+      if (refreshTimer) clearInterval(refreshTimer);
+      if (settings.refreshMinutes > 0) {
+        refreshTimer = setInterval(refresh, settings.refreshMinutes * 60 * 1000);
+      }
+    }
+
+    function openSettingsDialog() {
+      document.getElementById("setHost").value = settings.host;
+      document.getElementById("setPort").value = settings.port;
+      document.getElementById("setSecret").value = settings.secret;
+      document.getElementById("setUnits").value = settings.units;
+      document.getElementById("setLow").value = settings.low;
+      document.getElementById("setHigh").value = settings.high;
+      document.getElementById("setLookback").value = settings.lookbackHours;
+      document.getElementById("setPeakWindow").value = settings.peakWindowMinutes;
+      document.getElementById("setRefresh").value = settings.refreshMinutes;
+      document.getElementById("settingsDialog").showModal();
+    }
+
+    document.getElementById("btnSettings").addEventListener("click", openSettingsDialog);
+    document.getElementById("settingsCancel").addEventListener("click", () => {
+      document.getElementById("settingsDialog").close();
+    });
+    document.getElementById("settingsForm").addEventListener("submit", (ev) => {
+      ev.preventDefault();
+      settings = {
+        host: document.getElementById("setHost").value.trim() || DEFAULT_SETTINGS.host,
+        port: Number(document.getElementById("setPort").value) || DEFAULT_SETTINGS.port,
+        secret: document.getElementById("setSecret").value,
+        units: document.getElementById("setUnits").value,
+        low: Number(document.getElementById("setLow").value) || DEFAULT_SETTINGS.low,
+        high: Number(document.getElementById("setHigh").value) || DEFAULT_SETTINGS.high,
+        lookbackHours: Number(document.getElementById("setLookback").value) || DEFAULT_SETTINGS.lookbackHours,
+        peakWindowMinutes: Number(document.getElementById("setPeakWindow").value) || DEFAULT_SETTINGS.peakWindowMinutes,
+        refreshMinutes: Number(document.getElementById("setRefresh").value),
+      };
+      saveSettings(settings);
+      document.getElementById("settingsDialog").close();
+      scheduleRefresh();
+      refresh();
+    });
+
+    function openMealDialog() {
+      const now = new Date();
+      now.setSeconds(0, 0);
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      document.getElementById("mealTime").value = now.toISOString().slice(0, 16);
+      document.getElementById("mealLabel").value = "";
+      document.getElementById("mealCarbs").value = "";
+      document.getElementById("mealDialog").showModal();
+    }
+
+    document.getElementById("btnAddMeal").addEventListener("click", openMealDialog);
+    document.getElementById("mealCancel").addEventListener("click", () => {
+      document.getElementById("mealDialog").close();
+    });
+    document.getElementById("mealForm").addEventListener("submit", (ev) => {
+      ev.preventDefault();
+      const localValue = document.getElementById("mealTime").value;
+      const time = new Date(localValue).getTime();
+      const label = document.getElementById("mealLabel").value.trim();
+      const carbs = Number(document.getElementById("mealCarbs").value) || null;
+      meals.push({ id: Date.now(), time, label, carbs });
+      saveMeals(meals);
+      document.getElementById("mealDialog").close();
+      renderMeals();
+      renderHourly();
+    });
+
+    function openManualDialog() {
+      const now = new Date();
+      now.setSeconds(0, 0);
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      document.getElementById("manualTime").value = now.toISOString().slice(0, 16);
+      document.getElementById("manualValue").value = "";
+      document.getElementById("manualValueLabel").firstChild.textContent =
+        settings.units === "mmol" ? "Valor de glicose (mmol/L)" : "Valor de glicose (mg/dL)";
+      document.getElementById("manualDialog").showModal();
+    }
+
+    document.getElementById("btnAddManual").addEventListener("click", openManualDialog);
+    document.getElementById("manualCancel").addEventListener("click", () => {
+      document.getElementById("manualDialog").close();
+    });
+    document.getElementById("manualForm").addEventListener("submit", (ev) => {
+      ev.preventDefault();
+      const localValue = document.getElementById("manualTime").value;
+      const date = new Date(localValue).getTime();
+      const rawValue = Number(document.getElementById("manualValue").value);
+      const sgv = settings.units === "mmol" ? mmolToMgdl(rawValue) : rawValue;
+      manualReadings.push({ id: Date.now(), date, sgv });
+      saveManualReadings(manualReadings);
+      latestEntries = mergeEntries(liveEntries, manualReadings);
+      document.getElementById("manualDialog").close();
+      renderManualList();
+      renderSummary();
+      renderHourly();
+      renderMeals();
+    });
+
+    scheduleRefresh();
+    refresh();
+  }
+
+  // Export pure functions for the Node-based test harness.
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+      groupByHour,
+      analyzeMeal,
+      classify,
+      formatValue,
+      mgdlToMmol,
+      mmolToMgdl,
+      trendArrow,
+      buildSgvUrl,
+      mergeEntries,
+    };
+  }
+})();
+
+</script>
 </body>
 </html>

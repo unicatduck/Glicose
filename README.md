@@ -2,7 +2,7 @@
 
 App web simples que lê os valores de glicose do **xDrip+** (que já está a receber os dados da LinX/Aidex X) e mostra-os de forma clara, hora a hora, em vez do gráfico. Também permite registar refeições e ver o pico de glicose e a subida (delta) provocados por cada uma.
 
-Não precisa de instalação, servidor, nem conta na cloud — são 3 ficheiros estáticos (`web/index.html`, `web/style.css`, `web/app.js`) que correm diretamente no browser do telemóvel.
+Não precisa de instalação, servidor, nem conta na cloud — é um único ficheiro `web/index.html` autossuficiente (CSS e JavaScript já incluídos dentro dele) que corre diretamente no browser do telemóvel. Ser um único ficheiro é importante: em muitos telemóveis Android, quando abres um HTML a partir do gestor de ficheiros, o Chrome só recebe acesso a esse ficheiro isolado — se a app dependesse de ficheiros `.css`/`.js` separados ao lado, eles não carregavam e a app ficava sem responder a toques.
 
 ## Importante: usa sempre a versão local, não o link do GitHub Pages
 
@@ -51,3 +51,10 @@ As refeições e as leituras manuais ficam guardadas no armazenamento local do b
 
 **Colocaste uma palavra-passe na Web Service do xDrip+**
 - Introduz a mesma palavra-passe no campo "Palavra-passe da Web Service" nas Definições desta app
+
+**A app abre mas nada responde a toques (botões, definições)**
+- É o problema descrito acima: o Chrome não conseguiu carregar o CSS/JS porque não tinha acesso aos ficheiros ao lado do HTML. Confirma que estás a abrir `web/index.html` (o único ficheiro, já com tudo incluído) e não uma cópia antiga separada em vários ficheiros
+
+## Nota para quem for editar o código
+
+`web/index.html` é gerado automaticamente a partir de `web/template.html` + `web/style.css` + `web/app.js` pelo script `web/build.js`. Depois de editares `app.js` ou `style.css`, corre `node web/build.js` para atualizar o `index.html` final antes de o distribuir.

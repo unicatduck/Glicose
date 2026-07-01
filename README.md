@@ -1,17 +1,21 @@
 # Glicose Hora a Hora
 
-## Abrir a app (link fixo via GitHub Pages)
-
-1. No GitHub, vai a **Settings → Pages** deste repositório
-2. Em "Build and deployment" → **Source**, escolhe **GitHub Actions**
-3. Espera 1-2 minutos até o deploy terminar (aba **Actions** do repositório)
-4. A app fica disponível em `https://<o-teu-utilizador-github>.github.io/Glicose/`
-
-A partir daí, sempre que este código for atualizado, a página publica-se sozinha automaticamente — não precisas de repetir nada.
-
 App web simples que lê os valores de glicose do **xDrip+** (que já está a receber os dados da LinX/Aidex X) e mostra-os de forma clara, hora a hora, em vez do gráfico. Também permite registar refeições e ver o pico de glicose e a subida (delta) provocados por cada uma.
 
 Não precisa de instalação, servidor, nem conta na cloud — são 3 ficheiros estáticos (`web/index.html`, `web/style.css`, `web/app.js`) que correm diretamente no browser do telemóvel.
+
+## Importante: usa sempre a versão local, não o link do GitHub Pages
+
+Este repositório tem uma página publicada em `https://<utilizador>.github.io/Glicose/` (via GitHub Pages), mas serve **apenas para veres o aspeto da app ou testar sem dados reais**. Para ligar de verdade ao xDrip+, o browser precisa de contactar `127.0.0.1` (o próprio telemóvel), e os browsers modernos (Chrome incluído) **bloqueiam sites públicos de acederem a serviços na tua rede/telemóvel local**, por segurança — não há forma de contornar isto num site público como o github.io.
+
+Por isso, para uso real tens de abrir os ficheiros **localmente**, não pelo link:
+
+1. No telemóvel, abre **github.com/&lt;utilizador&gt;/Glicose** no Chrome
+2. Botão verde **"Code"** → **"Download ZIP"**
+3. Abre o `.zip` transferido com o gestor de ficheiros e escolhe **"Extrair"**
+4. Dentro da pasta extraída, entra em `web/` e toca em `index.html` → abrir com **Chrome**
+
+Podes adicionar essa página aos favoritos ou "Adicionar ao ecrã principal" no Chrome para abrir como se fosse uma app. Sempre que o código for atualizado, repete estes passos para teres a versão nova.
 
 ## Como funciona
 
@@ -23,14 +27,6 @@ O xDrip+ tem um serviço web local (compatível com o formato Nightscout) que re
 2. Ativa **"Web Service"**
 3. Confirma que a porta está em **17580** (é o valor por omissão)
 4. Deixa a palavra-passe da Web Service vazia, a não ser que queiras usar autenticação (ver secção "Definições" abaixo)
-
-## Abrir a app no telemóvel
-
-1. Copia a pasta `web/` para o telemóvel (ex: por email, Google Drive, cabo USB)
-2. No gestor de ficheiros do telemóvel, toca em `web/index.html` e escolhe abrir com o **Chrome**
-3. A app deve mostrar automaticamente as leituras do xDrip+. Se aparecer uma mensagem de erro na barra superior, lê a secção "Resolução de problemas" abaixo
-
-Dica: podes adicionar a página aos favoritos ou "Adicionar ao ecrã principal" no Chrome para abrir como se fosse uma app.
 
 ## Usar a app
 
@@ -45,6 +41,7 @@ As refeições e as leituras manuais ficam guardadas no armazenamento local do b
 ## Resolução de problemas
 
 **"Erro a ligar ao xDrip+: Failed to fetch"**
+- Se estiveres a abrir através do link `github.io`: é esperado, os browsers bloqueiam sites públicos de acederem a serviços locais do telemóvel — usa sempre a versão extraída do ZIP (ver secção acima)
 - Confirma que o xDrip+ está aberto/a correr em segundo plano
 - Confirma que "Web Service" está ativado em Inter-app settings
 - Confirma que estás a abrir a página no *mesmo telemóvel* onde o xDrip+ está instalado (o endereço 127.0.0.1 refere-se sempre ao próprio dispositivo)

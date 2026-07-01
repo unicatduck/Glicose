@@ -28,9 +28,10 @@ Dica: podes adicionar a página aos favoritos ou "Adicionar ao ecrã principal" 
 - **Leituras por hora**: tabela com a hora, última leitura, mínimo, máximo e tendência de cada hora. Cores: azul = baixo, verde = normal, vermelho = alto.
 - **Resumo**: média, mínimo, máximo e percentagem de tempo no intervalo saudável nas últimas horas (configurável).
 - **Refeições**: toca em "+ Registar refeição" para guardar a hora (e opcionalmente descrição/gramas de carboidratos) de uma refeição. A app calcula automaticamente o pico de glicose e a subida (delta) nas horas seguintes, para ajudares a perceber quais refeições causam mais picos. Um ícone 🍽️ aparece na tabela na hora em que registaste a refeição.
+- **Leituras antigas (manuais)**: o xDrip+ só regista valores a partir do momento em que ligaste o "Companion App" à LinX — não consegue ir buscar o histórico que a LinX já tinha antes disso. Para preencheres esse período, toca em "+ Adicionar leitura", olha para o valor no gráfico da LinX numa determinada hora, e escreve-o aqui com a data/hora certa. Essas leituras ficam marcadas com ✍️ na tabela e entram nos cálculos de resumo e de picos de refeições tal como as leituras normais.
 - **Definições** (ícone de engrenagem): unidades (mg/dL ou mmol/L), limites de hipo/hiperglicemia, quantas horas mostrar, janela de tempo para calcular o pico pós-refeição, e frequência de atualização automática.
 
-As refeições ficam guardadas no armazenamento local do browser (não saem do telemóvel).
+As refeições e as leituras manuais ficam guardadas no armazenamento local do browser (não saem do telemóvel). Se limpares os dados do browser (Chrome), perdes esse histórico — o xDrip+ continua a ter os dados dele à parte.
 
 ## Resolução de problemas
 

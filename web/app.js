@@ -15,6 +15,7 @@
 
   const SETTINGS_KEY = "glicose.settings";
   const MEALS_KEY = "glicose.meals";
+  const MANUAL_KEY = "glicose.manualReadings";
 
   function loadSettings() {
     try {
@@ -44,10 +45,28 @@
     localStorage.setItem(MEALS_KEY, JSON.stringify(meals));
   }
 
+  function loadManualReadings() {
+    try {
+      const raw = localStorage.getItem(MANUAL_KEY);
+      if (!raw) return [];
+      return JSON.parse(raw);
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveManualReadings(readings) {
+    localStorage.setItem(MANUAL_KEY, JSON.stringify(readings));
+  }
+
   // ---- Pure data helpers (also used by tests) ----
 
   function mgdlToMmol(mgdl) {
     return mgdl / 18.018;
+  }
+
+  function mmolToMgdl(mmol) {
+    return mmol * 18.018;
   }
 
   function formatValue(mgdl, units) {
@@ -108,6 +127,7 @@
         min: Math.min(...values),
         max: Math.max(...values),
         count: sorted.length,
+        hasManual: sorted.some((r) => r.source === "manual"),
       });
     }
     result.sort((a, b) => b.hourStart - a.hourStart);
@@ -171,7 +191,21 @@
     const cutoff = Date.now() - settings.lookbackHours * 60 * 60 * 1000;
     return data
       .filter((e) => typeof e.sgv === "number" && e.date >= cutoff)
-      .map((e) => ({ date: e.date, sgv: e.sgv, direction: e.direction }));
+      .map((e) => ({ date: e.date, sgv: e.sgv, direction: e.direction, source: "xdrip" }));
+  }
+
+  /**
+   * Merges live xDrip+ entries with manually-added historical readings into one
+   * sorted list, so both feed the same hourly grouping / meal analysis.
+   */
+  function mergeEntries(liveEntries, manualReadings) {
+    const manualAsEntries = manualReadings.map((m) => ({
+      date: m.date,
+      sgv: m.sgv,
+      direction: undefined,
+      source: "manual",
+    }));
+    return liveEntries.concat(manualAsEntries).sort((a, b) => a.date - b.date);
   }
 
   // ---- UI wiring (skipped entirely in non-browser test environment) ----
@@ -181,6 +215,8 @@
   if (isBrowser) {
     let settings = loadSettings();
     let meals = loadMeals();
+    let manualReadings = loadManualReadings();
+    let liveEntries = [];
     let latestEntries = [];
     let refreshTimer = null;
 
@@ -188,6 +224,7 @@
     const summaryEl = document.getElementById("summary");
     const hourlyBody = document.getElementById("hourlyBody");
     const mealsList = document.getElementById("mealsList");
+    const manualList = document.getElementById("manualList");
 
     function setStatus(message, isError) {
       statusBar.textContent = message;
@@ -241,13 +278,14 @@
           const cls = classify(b.last, settings.low, settings.high);
           const mealsHere = mealsInHour(b.hourStart);
           const mealMark = mealsHere.length ? `<span class="meal-marker" title="${mealsHere.map((m) => m.label || "refeição").join(", ")}">🍽️</span>` : "";
+          const manualMark = b.hasManual ? `<span class="meal-marker" title="Leitura manual (antiga)">✍️</span>` : "";
           return `<tr class="${cls}">
             <td>${hourLabel(b.hourStart)}</td>
             <td><span class="badge ${cls}">${formatValue(b.last, settings.units)}</span></td>
             <td>${formatValue(b.min, settings.units)}</td>
             <td>${formatValue(b.max, settings.units)}</td>
             <td>${trendArrow(b.direction)}</td>
-            <td>${mealMark}</td>
+            <td>${mealMark}${manualMark}</td>
           </tr>`;
         })
         .join("");
@@ -295,13 +333,49 @@
       });
     }
 
+    function renderManualList() {
+      const sorted = manualReadings.slice().sort((a, b) => b.date - a.date);
+      if (sorted.length === 0) {
+        manualList.innerHTML = `<div class="empty-hint">Ainda não adicionaste nenhuma leitura antiga.</div>`;
+        return;
+      }
+      manualList.innerHTML = sorted
+        .map((m) => {
+          const time = new Date(m.date).toLocaleString("pt-PT", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+          return `<div class="meal-card" data-id="${m.id}">
+            <div class="meal-main">
+              <span class="meal-time">${time}</span>
+              <span class="meal-label">Leitura manual</span>
+            </div>
+            <div class="meal-stats">${formatValue(m.sgv, settings.units)} ${settings.units === "mmol" ? "mmol/L" : "mg/dL"}</div>
+            <button class="delete" data-id="${m.id}" title="Apagar">&times;</button>
+          </div>`;
+        })
+        .join("");
+
+      manualList.querySelectorAll("button.delete").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-id");
+          manualReadings = manualReadings.filter((m) => String(m.id) !== id);
+          saveManualReadings(manualReadings);
+          latestEntries = mergeEntries(liveEntries, manualReadings);
+          renderManualList();
+          renderSummary();
+          renderHourly();
+          renderMeals();
+        });
+      });
+    }
+
     async function refresh() {
       setStatus("A atualizar...");
       try {
-        latestEntries = await fetchEntries(settings);
+        liveEntries = await fetchEntries(settings);
+        latestEntries = mergeEntries(liveEntries, manualReadings);
         renderSummary();
         renderHourly();
         renderMeals();
+        renderManualList();
         setStatus(`Atualizado às ${new Date().toLocaleTimeString("pt-PT")} · ${latestEntries.length} leituras`);
       } catch (err) {
         console.error(err);
@@ -309,6 +383,9 @@
           ? " (pode ser CORS/rede: confirma que o Web Service está ativo no xDrip+ e que estás a abrir esta página no mesmo telemóvel)"
           : "";
         setStatus(`Erro a ligar ao xDrip+: ${err.message}${hint}`, true);
+        latestEntries = mergeEntries([], manualReadings);
+        renderHourly();
+        renderManualList();
       }
     }
 
@@ -382,6 +459,37 @@
       renderHourly();
     });
 
+    function openManualDialog() {
+      const now = new Date();
+      now.setSeconds(0, 0);
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      document.getElementById("manualTime").value = now.toISOString().slice(0, 16);
+      document.getElementById("manualValue").value = "";
+      document.getElementById("manualValueLabel").firstChild.textContent =
+        settings.units === "mmol" ? "Valor de glicose (mmol/L)" : "Valor de glicose (mg/dL)";
+      document.getElementById("manualDialog").showModal();
+    }
+
+    document.getElementById("btnAddManual").addEventListener("click", openManualDialog);
+    document.getElementById("manualCancel").addEventListener("click", () => {
+      document.getElementById("manualDialog").close();
+    });
+    document.getElementById("manualForm").addEventListener("submit", (ev) => {
+      ev.preventDefault();
+      const localValue = document.getElementById("manualTime").value;
+      const date = new Date(localValue).getTime();
+      const rawValue = Number(document.getElementById("manualValue").value);
+      const sgv = settings.units === "mmol" ? mmolToMgdl(rawValue) : rawValue;
+      manualReadings.push({ id: Date.now(), date, sgv });
+      saveManualReadings(manualReadings);
+      latestEntries = mergeEntries(liveEntries, manualReadings);
+      document.getElementById("manualDialog").close();
+      renderManualList();
+      renderSummary();
+      renderHourly();
+      renderMeals();
+    });
+
     scheduleRefresh();
     refresh();
   }
@@ -394,8 +502,10 @@
       classify,
       formatValue,
       mgdlToMmol,
+      mmolToMgdl,
       trendArrow,
       buildSgvUrl,
+      mergeEntries,
     };
   }
 })();

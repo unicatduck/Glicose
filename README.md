@@ -1,5 +1,14 @@
 # Glicose Hora a Hora
 
+## Abrir a app (link fixo via GitHub Pages)
+
+1. No GitHub, vai a **Settings → Pages** deste repositório
+2. Em "Build and deployment" → **Source**, escolhe **GitHub Actions**
+3. Espera 1-2 minutos até o deploy terminar (aba **Actions** do repositório)
+4. A app fica disponível em `https://<o-teu-utilizador-github>.github.io/Glicose/`
+
+A partir daí, sempre que este código for atualizado, a página publica-se sozinha automaticamente — não precisas de repetir nada.
+
 App web simples que lê os valores de glicose do **xDrip+** (que já está a receber os dados da LinX/Aidex X) e mostra-os de forma clara, hora a hora, em vez do gráfico. Também permite registar refeições e ver o pico de glicose e a subida (delta) provocados por cada uma.
 
 Não precisa de instalação, servidor, nem conta na cloud — são 3 ficheiros estáticos (`web/index.html`, `web/style.css`, `web/app.js`) que correm diretamente no browser do telemóvel.
